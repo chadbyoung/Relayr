@@ -1,5 +1,3 @@
-# redis-snap  
-
 # Relayr Edge Agent Snap  
 This REPO holds code that is intended for development of a Relayr Edge Agent snap  
 
