@@ -1,0 +1,54 @@
+Relayr Docker Install Instruction
+
+1. Find docker using snap command: snap find docker
+2. Try to add docker group: sudo groupadd --system docker
+3. Install docker: sudo snap install docker
+4. Connect the Interfaces:
+    4.1 sudo snap connect docker:docker-cli docker:docker-daemon
+    4.2 sudo snap connect docker:firewall-control
+    4.3. sudo snap connect docker:support
+5. Restart the service: 
+    5.1 sudo service snap.docker.dockerd stop
+    5.2 sudo service snap.docker.dockerd start
+6. Create Yocto Linux skeleton image using sudo docker pull gmacario/build-yocto      
+7. Create container using sudo docker run -ti gmacario/build-yocto
+8. Clone the Yocto metadata: 
+    8.1. mkdir -p ~/shared && sudo chown build.build ~/shared
+    8.2. cd ~/shared
+    8.3. git clone -b jethro git://git.yoctoproject.org/poky
+9. Update the Yocto metadata: cd ~/shared/poky && git pull --all --prune
+10. Install systemd init system:  sudo apt-get install systemd
+11. Install RPM package manager: sudo apt-get install rpm
+12. Install python: sudo apt-get install python-dev libxml2-dev libxslt-dev == Success
+13. Install python libraries for rpm sudo apt-get install python-rpm == Success
+
+/***************Installing Smart Package Manager
+14. git clone git://github.com/smartpm/smart.git
+15. sudo python setup.py install; Install may throw the following errors but can be ignored:
+    a. error: can't copy 'locale/fr/LC_MESSAGES/smart.mo': doesn't exist or not a regular file
+    b. Error while running msgfmt on locale/sv/LC_MESSAGES
+/***************End Installation
+
+/***************relayr Edge Agent and the Dell/Intel/Bosch IoT Starter Kit Started
+16. sudo smart channel --add https://packages.relayr.io/windriver/relayr.repo
+17. sudo wget https://packages.relayr.io/windriver/relayr-pub-GPG.txt
+18. sudo rpm --import relayr-pub-GPG.txt && rm relayr-pub-GPG.txt
+19. sudo smart update && smart upgrade
+20. Repeat for each of the 4 PackageNames - redis, node-red, relayr-system-health-adapter and relayr-vertex
+    20.1. sudo smart download <PackageName>
+    20.2. sudo rpm -i <PackageName> --nodeps
+    Note - All packages are installed but ignore the following errors error in redis, node-red, relayr-system-health-adapter and relayr-vertex mention below:
+        a. Operation failed: Invalid argument 
+        b. Failed to get D-Bus connection: No connection to service manager.
+        c. warning: %post(<PackageName>) scriptlet failed, exit status 1
+    20.3. Create init service using following command: ///Create init services for node-red, redis, relayr-vertex and relayr-system-health-adapter
+    20.4. sudo vi /etc/<PackageName><relayr to send the init scripts separately>
+    20.5. sudo chmod 755 <PackageName>
+    20.6. sudo update-rc.d <PackageName> defaults
+21. Edit the redis.conf file to the file sent by relayr (enclosed).
+22. Run setup script for relayr gateway agent - sudo vertex-configure <gateway agent name> <gateway agent location> <Brearer token from Account link on left navigation panel of developer.relayr.io  excluding “Bearer” keyword>
+23. Start the relayr services (or reboot)
+    23.1. /etc/init.d/redis-server start
+    23.2. /etc/init.d/relayr-vertex start
+    23.3. /etc/init.d/relayr-system-health-adapter start
+    23.4. /etc/init.d/nodered start
